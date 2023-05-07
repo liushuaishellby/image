@@ -1,3 +1,4 @@
+import os
 from datetime import datetime
 from flask import render_template, request
 from run import app
@@ -64,3 +65,17 @@ def get_count():
     """
     counter = Counters.query.filter(Counters.id == 1).first()
     return make_succ_response(0) if counter is None else make_succ_response(counter.count)
+
+
+@app.route('/api/image', methods=['POST'])
+def get_image():
+    file = request.files.get('file')
+    file_path = os.path.join('pic', file.filename)
+    file.save(file_path)
+    data = get_result(file_path)
+    new_data = {
+        "result": data[0],
+        "num": data[1]
+    }
+    os.remove(file_path)
+    return make_succ_response(new_data)
